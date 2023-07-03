@@ -1,0 +1,37 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: test
+  datasource:
+    url: jdbc:postgresql://containers-us-west-183.railway.app:7693/railway
+    username: postgres
+    password: k699vwjFP7nMLfrX76Uh
+    driver-class-name: org.postgresql.Driver
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connectTimeout: 30000
+            readTimeout: 30000
+            loggerLevel: FULL
+  jpa:
+    hibernate.ddl-auto: validate
+
+feign:
+  giphy:
+    url: https://api.giphy.com
+    key: BIanpP9oDid1TztEmQ5tnBoKVGbuLb9x
+  exchanger:
+    url: https://openexchangerates.org/api/
+    id: d8abd4451f984415bf558552a779501c
+
+nochange:
+  image: https://i.giphy.com/media/OJac5MRF6xJpqQAcR5/giphy.gif
+
+uptag: rich
+downtag: broke
+base: USD
+

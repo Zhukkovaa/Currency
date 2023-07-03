@@ -1,0 +1,26 @@
+# H2 Database
+server:
+  port: 8080
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+
+feign:
+  giphy:
+    url: https://api.giphy.com
+    key: BIanpP9oDid1TztEmQ5tnBoKVGbuLb9x
+  exchanger:
+    url: https://openexchangerates.org/api/
+    id: d8abd4451f984415bf558552a779501c
+
+nochange:
+  image: https://i.giphy.com/media/OJac5MRF6xJpqQAcR5/giphy.gif
+
+uptag: rich
+downtag: broke
+base: USD

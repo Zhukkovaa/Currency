@@ -1,0 +1,92 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+tags:
+  - name: Base controller
+    description: Controller for check currency exchanges
+paths:
+  /currency/{currencyCode}:
+    get:
+      tags:
+        - Base controller
+      summary: Get gif
+      description: Get bif as bytes for exchange of currency to USD
+      operationId: getGif
+      parameters:
+        - name: currencyCode
+          in: path
+          description: Currency code
+          required: true
+          schema:
+            type: string
+          example: RUB
+      responses:
+        '200':
+          description: Returns random gif
+          content:
+            image/gif: {}
+  /currency/api/status:
+    get:
+      tags:
+        - Base controller
+      summary: Get api stats
+      description: Get stats of requests for API with paging
+      operationId: getApiStats
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: rowsPerPage
+          in: query
+          description: Rows per page
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 20
+      responses:
+        '200':
+          description: Returns stats list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Currency'
+components:
+  schemas:
+    Currency:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID
+          format: int32
+          example: 1
+        base:
+          type: string
+          description: Base currency for check
+          example: USD
+        rate:
+          type: string
+          description: Rate currency for check
+          example: RUB
+        value:
+          type: number
+          description: Currency value
+          format: double
+          example: 86.5
+        date:
+          type: string
+          description: Date
+          format: date-time
+          example: '2023-06-28T16:20:05.74Z'

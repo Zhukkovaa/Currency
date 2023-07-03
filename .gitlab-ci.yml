@@ -1,0 +1,48 @@
+image: maven:latest #Задает образ Docker, используемый для выполнения задач в GitLab CI
+services: #Задаёт контейнеры, которые будут запущены и будут доступны на время выполнения задач в GitLab CI
+  - name: docker:dind #позволяет выполнять команды Docker внутри контейнера
+variables: #определяет переменные среды для использования в скриптах
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository" #для указания локального репозитория Maven
+  DOCKER_HOST: "tcp://docker:2375" #для указания адреса и порта Docker-демона
+  DOCKER_TLS_CERTDIR: "" #для отключения TLS при подключении к Docker-демону
+  DOCKER_DRIVER: "overlay2" #для указания драйвера хранения данных Docker
+stages: #Определяет последовательность этапов (stage) выполнения задач в GitLab CI
+  - build_and_test
+  - package
+  - deploy
+cache: #Определяет пути, которые должны быть кэшированы во время выполнения задач в GitLab CI
+  #В данном случае указан путь .m2/repository, который содержит локальный репозиторий Maven
+  paths:
+    - .m2/repository
+Build project: #Определяет задачу с названием "Build project", которая будет выполняться на этапе build_and_test
+  stage: build_and_test
+  script:
+    - mvn $MAVEN_OPTS compile #выполняет компиляцию проекта с помощью Maven
+Test project: #Определяет задачу с названием "Test project", которая также будет выполняться на этапе build_and_test
+  stage: build_and_test
+  script:
+    - mvn $MAVEN_OPTS test
+  artifacts: #определяет список артефактов, которые будут сохранены после выполнения задачи
+    paths:
+      - "**/target/*.jar" #указывает на сохранение всех JAR-файлов из каталога "target"
+    reports: # определяет список отчетов, которые будут сохранены после выполнения задачи
+      junit:
+        - "**/target/surefire-reports/TEST-*.xml" #указывает на сохранение всех отчетов о тестировании из каталога "target/surefire-reports"
+Package project: #определяет задачу с названием "Package project" для этапа "package"
+  stage: package
+  script:
+    - ./mvnw $MAVEN_OPTS package #выполняет упаковку проекта с помощью Maven Wrapper
+  artifacts:
+    paths:
+      - "**/target/*.jar"
+    expire_in: 11 day #указывает, что артефакты будут храниться в течение 11 дней
+deploy-railway: # определяет задачу с названием "deploy-railway" для этапа "deploy
+  stage: deploy
+  image: ubuntu #указывает на использование образа Ubuntu для выполнения задачи
+  only: #определяет условия, при которых задача будет выполняться
+    - pushes #указывает, что задача будет выполняться только после push-события
+    - dev #указывает, что задача будет выполняться только для ветки "dev"
+  script: #определяет список команд, которые будут выполняться внутри задачи
+    - apt-get update && apt-get install -y curl #обновляет список пакетов и устанавливает пакет curl
+    - curl -fsSL https://railway.app/install.sh | sh #загружает и запускает скрипт установки Railway
+    - railway up --service=$RAILWAY_SERVICE_NAME -d #запускает команду railway up для развертывания сервиса с указанным именем
